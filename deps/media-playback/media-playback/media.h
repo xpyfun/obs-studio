@@ -54,6 +54,7 @@ struct mp_media {
 	char *path;
 	char *format_name;
 	int buffering;
+	int speed;
 
 	enum AVPixelFormat scale_format;
 	struct SwsContext *swscale;
@@ -92,26 +93,40 @@ struct mp_media {
 
 	bool thread_valid;
 	pthread_t thread;
+
+	bool pause;
+	bool reset_ts;
+	bool seek;
+	int64_t seek_pos;
 };
 
 typedef struct mp_media mp_media_t;
 
-extern bool mp_media_init(mp_media_t *media,
-		const char *path,
-		const char *format,
-		int buffering,
-		void *opaque,
-		mp_video_cb v_cb,
-		mp_audio_cb a_cb,
-		mp_stop_cb stop_cb,
-		mp_video_cb v_preload_cb,
-		bool hardware_decoding,
-		bool is_local_file,
-		enum video_range_type force_range);
+struct mp_media_info {
+	void *opaque;
+
+	mp_video_cb v_cb;
+	mp_video_cb v_preload_cb;
+	mp_audio_cb a_cb;
+	mp_stop_cb stop_cb;
+
+	const char *path;
+	const char *format;
+	int buffering;
+	int speed;
+	enum video_range_type force_range;
+	bool hardware_decoding;
+	bool is_local_file;
+};
+
+extern bool mp_media_init(mp_media_t *media, const struct mp_media_info *info);
 extern void mp_media_free(mp_media_t *media);
 
 extern void mp_media_play(mp_media_t *media, bool loop);
 extern void mp_media_stop(mp_media_t *media);
+extern void mp_media_play_pause(mp_media_t *media, bool pause);
+extern int64_t mp_get_current_time(mp_media_t *m);
+extern void mp_media_seek_to(mp_media_t *m, int64_t pos);
 
 /* #define DETAILED_DEBUG_INFO */
 

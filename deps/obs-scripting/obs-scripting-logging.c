@@ -22,20 +22,31 @@ static scripting_log_handler_t callback = NULL;
 static void *param = NULL;
 
 void script_log_va(obs_script_t *script, int level, const char *format,
-		va_list args)
+		   va_list args)
 {
 	char msg[2048];
 	const char *lang = "(Unknown)";
 	size_t start_len;
 
-	switch (script->type) {
-	case OBS_SCRIPT_LANG_UNKNOWN: lang = "(Unknown language)"; break;
-	case OBS_SCRIPT_LANG_LUA:     lang = "Lua"; break;
-	case OBS_SCRIPT_LANG_PYTHON:  lang = "Python"; break;
+	if (script) {
+		switch (script->type) {
+		case OBS_SCRIPT_LANG_UNKNOWN:
+			lang = "(Unknown language)";
+			break;
+		case OBS_SCRIPT_LANG_LUA:
+			lang = "Lua";
+			break;
+		case OBS_SCRIPT_LANG_PYTHON:
+			lang = "Python";
+			break;
+		}
+
+		start_len = snprintf(msg, sizeof(msg), "[%s: %s] ", lang,
+				     script->file.array);
+	} else {
+		start_len = snprintf(msg, sizeof(msg), "[Unknown Script] ");
 	}
 
-	start_len = snprintf(msg, sizeof(msg), "[%s: %s] ",
-			lang, script->file.array);
 	vsnprintf(msg + start_len, sizeof(msg) - start_len, format, args);
 
 	if (callback)
@@ -52,7 +63,7 @@ void script_log(obs_script_t *script, int level, const char *format, ...)
 }
 
 void obs_scripting_set_log_callback(scripting_log_handler_t handler,
-		void *log_param)
+				    void *log_param)
 {
 	callback = handler;
 	param = log_param;

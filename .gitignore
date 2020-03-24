@@ -16,6 +16,7 @@
 /debug32/
 /debug64/
 /builds/
+.vs/
 *.o.d
 *.ninja
 .ninja*
@@ -35,6 +36,8 @@ x64/
 ipch/
 GeneratedFiles/
 .moc/
+/UI/obs.rc
+.vscode/
 
 /other/
 
@@ -86,7 +89,6 @@ tags
 *.obj
 *.pdb
 *.res
-*.manifest
 *.dep
 *.zip
 *.lnk
